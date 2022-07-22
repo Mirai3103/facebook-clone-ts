@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  mysqldb:
+    image: mysql:8.0.29
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      - MYSQL_ROOT_PASSWORD=$DB_ROOT_PASSWORD
+      - MYSQL_DATABASE=$DB_DATABASE
+      - PORT=3306
+    ports:
+      - $DB_LOCAL_PORT:$DB_DOCKER_PORT
+    volumes:
+      - db:/var/lib/mysql
+  app:
+    depends_on:
+      - mysqldb
+    build: ./server
+    restart: unless-stopped
+    env_file: ./.env
+    ports:
+      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+    environment:
+      - HOST=mysqldb
+      - USER=$DB_USER
+      - PASSWORD=$DB_ROOT_PASSWORD
+      - DB=$DB_DATABASE
+      - DB_PORT=$DB_DOCKER_PORT
+      - PORT=$NODE_DOCKER_PORT
+      - CLIENT_ID=$CLIENT_ID
+      - CLIENT_SECRET=$CLIENT_SECRET
+      - REFRESH_TOKEN=$REFRESH_TOKEN
+      - ACCESS_TOKEN=$ACCESS_TOKEN
+    stdin_open: true
+    tty: true
+  client:
+    depends_on:
+      - app
+    build: ./client
+    env_file: ./.env
+    environment:
+      - API_URL=$API_URL
+    restart: unless-stopped
+    ports:
+      - 3000:80
+volumes:
+  db:

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input type="file" id="cc"/>
+    <button>Send</button>
+</body>
+<!-- axios -->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    var file = document.getElementById('cc');
+    var button = document.querySelector('button');
+    button.addEventListener('click', function(){
+        const formData = new FormData();
+        formData.append('type', 'file');
+        formData.append('action', 'upload');
+        formData.append('timestamp', '1656833558090');
+        formData.append('auth_token', '7a85187d637bab53cd4d45169d9ce47ac233e2fe');
+        formData.append('nsfw', '0');
+        formData.append('source', file.files[0]);
+        axios.post('https://freeimage.host/json', formData)
+        .then(function(res){
+            console.log(res);
+        })
+        .catch(function(err){
+            console.log(err);
+        });
+    });
+    </script>
+</html>
