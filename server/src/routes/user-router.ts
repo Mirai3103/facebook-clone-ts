@@ -3,7 +3,7 @@ import { Request, Response, Router, RequestHandler } from 'express';
 
 import userService from '../services/user.service';
 import { BadRequestError } from '@shared/errors';
-import User, { IdentifyUser, UserCreator } from '@models/user.model';
+import { IUser, IUserDocument } from '@models/user.model';
 import friendService from '@services/friend.service';
 
 
@@ -36,7 +36,7 @@ router.get(p.get, (async (_: Request, res: Response) => {
  * Add one user.
  */
 router.post(p.add, (async (req: Request, res: Response) => {
-    const { user }: { user: UserCreator } = req.body;
+    const { user }: { user: IUserDocument } = req.body;
     // Check param
     if (!user) {
         throw new BadRequestError('User is required');
@@ -50,57 +50,58 @@ router.post(p.add, (async (req: Request, res: Response) => {
 /**
  * Update one user.
  */
-router.put(p.update, (async (req: Request, res: Response) => {
-    const { id, email, user }: { id?: string, email?: string, user: UserCreator } = req.body;
-    // Check param
-    if (!user && !id && !email) {
-        throw new BadRequestError('User, id or email is required');
-    }
-    const identify: IdentifyUser = {};
-    if (id) {
-        identify.id = id;
-    }
-    if (email) {
-        identify.email = email;
-    }
-    await userService.updateOne(identify, user);
-    return res.status(OK).end();
-}) as RequestHandler);
+// router.put(p.update, (async (req: Request, res: Response) => {
+//     const { id, email, user }: { id?: string, email?: string, user: IUser } = req.body;
+//     // Check param
+//     if (!user && !id && !email) {
+//         throw new BadRequestError('User, id or email is required');
+//     }
+//     const identify: IdentifyUser = {};
+//     if (id) {
+//         identify.id = id;
+//     }
+//     if (email) {
+//         identify.email = email;
+//     }
+//     await userService.updateOne(identify, user);
+//     return res.status(OK).end();
+// }) as RequestHandler);
 
 
 /**
  * Delete one user.
  */
-router.delete(p.delete, ((req: Request, res: Response) => {
+// router.delete(p.delete, ((req: Request, res: Response) => {
 
-    // Fetch data
-    const { id, email }: { id?: string, email?: string } = req.body;
-    // Check param
-    if (!id && !email) {
-        throw new BadRequestError('id or email is required');
-    }
-    const identify: IdentifyUser = {};
-    if (id) {
-        identify.id = id;
-    }
-    if (email) {
-        identify.email = email;
-    }
-    userService.delete(identify);
-    return res.status(OK).end();
-}) as RequestHandler);
+//     // Fetch data
+//     const { id, email }: { id?: string, email?: string } = req.body;
+//     // Check param
+//     if (!id && !email) {
+//         throw new BadRequestError('id or email is required');
+//     }
+//     const identify: IdentifyUser = {};
+//     if (id) {
+//         identify.id = id;
+//     }
+//     if (email) {
+//         identify.email = email;
+//     }
+//     userService.delete(identify);
+//     return res.status(OK).end();
+// }) as RequestHandler);
 
 
 router.get(p.search, (async (req: Request, res: Response) => {
     const { name }: { name?: string } = req.query;
-    const { user }: { user: User } = req;
+    const { user }: { user: IUserDocument } = req;
     // Check param
     if (!name) {
         throw new BadRequestError('Name is required');
     }
     // Fetch data
     const users = await userService.findLikeName(name);
-    const userWithRelationship = await friendService.addRelationshipToListUser(user.id, users);
+    const userWithRelationship = await friendService
+        .addRelationshipToListUser(user._id, users);
     console.log(userWithRelationship);
     return res.status(OK).json({ users: userWithRelationship });
 }) as RequestHandler);

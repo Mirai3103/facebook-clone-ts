@@ -15,7 +15,6 @@ export default function Body() {
     const auth = useAuth();
     React.useEffect(() => {
         const handleHasNewPost = (data: IPost) => {
-            console.log(data)
             setChange(pre => !pre)
         }
         auth.socket?.on('new-post-added', handleHasNewPost);
@@ -26,8 +25,8 @@ export default function Body() {
 
     React.useEffect(() => {
         PostService.getAllPosts().then(res => {
-            console.log(res.data.posts);
             setPosts(res.data.posts);
+
         }
         ).catch(err => {
             console.log(err);
@@ -49,12 +48,12 @@ export default function Body() {
                         <AddNewPost />
                     </Card>
                     {posts.map(post =>
-                        <Card key={post.id}>
+                        <Card key={post._id}>
                             <Post
-                                avatarURL={post.user.userDetail.avatarUrl}
+                                avatarUrl={post.user.userDetail.avatarUrl}
                                 createdAt={post.createdAt as Date}
                                 fullName={post.user.firstName + " " + post.user.lastName}
-                                id={post.id as number}
+                                _id={post._id as string}
                                 image={post.imageUrl !== '' ? "https://drive.google.com/uc?export=view&id=" + post.imageUrl : null}
                                 text={post.content}
 

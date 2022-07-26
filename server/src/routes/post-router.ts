@@ -1,7 +1,7 @@
 import { Router, RequestHandler } from "express";
 import postService from "@services/post.service";
 import { CustomRequest } from "./middleware";
-import { PostCreator } from "@models/post.model";
+import { IPost } from "@models/post.model";
 import multer from 'multer';
 
 import { BadRequestError } from "@shared/errors";
@@ -45,7 +45,7 @@ router.put("/update", (async (req, res) => {
         throw new Error("Missing postId or post");
     }
 
-    await postService.updatePost(postId as number, post as PostCreator);
+    await postService.updatePost(postId as string, post as IPost);
     return res.status(200).json({ message: "Post updated" });
 }) as RequestHandler);
 
@@ -55,7 +55,7 @@ router.delete("/delete/:id", (async (req, res) => {
         throw new Error("Missing postId");
     }
 
-    await postService.deletePost(Number(id));
+    await postService.deletePost(id);
     return res.status(200).json({ message: "Post deleted" });
 }
 ) as RequestHandler);

@@ -54,7 +54,7 @@ export default function LoginModal({ closeModal, isOpen, contentLabel }: LoginMo
             lastName: userInfo.lastName,
             email: userInfo.username,
             birthday: new Date(userInfo.dateOfBirth),
-            gender: userInfo.gender.toUpperCase() as unknown as Genders,
+            gender: Number(userInfo.gender),
             pwdHash: userInfo.password,
         }, file as File).then(res => {
             Toast.showToast(<div className='text-green-500'>Success</div>, <div>Đăng ký thành công, mời bạn đăng nhập</div>, 5000)
@@ -97,15 +97,15 @@ export default function LoginModal({ closeModal, isOpen, contentLabel }: LoginMo
             <div className='grid grid-cols-3 gap-x-4'>
                 <div className='flex items-center justify-between border-solid rounded-md border-gray-300 border-2 px-2 py-1'>
                     <label htmlFor='female'>Female</label>
-                    <input type="radio" onChange={e => e.target.checked ? updateUser('gender', 'FEMALE') : null} id="female" name="gender" value="female"></input>
+                    <input type="radio" onChange={e => e.target.checked ? updateUser('gender', '0') : null} id="female" name="gender" value="female"></input>
                 </div>
                 <div className='flex items-center justify-between border-solid rounded-md border-gray-300 border-2 px-2'>
                     <label htmlFor='male'>Male</label>
-                    <input type="radio" onChange={e => e.target.checked ? updateUser('gender', 'MAlE') : null} id="male" name="gender" value="male"></input>
+                    <input type="radio" onChange={e => e.target.checked ? updateUser('gender', '1') : null} id="male" name="gender" value="male"></input>
                 </div>
                 <div className='flex items-center justify-between border-solid rounded-md border-gray-300 border-2 px-2'>
                     <label htmlFor='gay'>Orther</label>
-                    <input type="radio" onChange={e => e.target.checked ? updateUser('gender', 'OTHER') : null} id="gay" name="gender" value="gay"></input>
+                    <input type="radio" onChange={e => e.target.checked ? updateUser('gender', '2') : null} id="gay" name="gender" value="gay"></input>
                 </div>
                 <div>
                     <input onChange={onfileChange} type="file" name="Avatar" id="" />

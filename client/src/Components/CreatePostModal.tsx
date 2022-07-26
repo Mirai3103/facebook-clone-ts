@@ -23,7 +23,6 @@ export default function CreatePostModal({ isOpen, closeModal, contentLabel }: Cr
     const handlePost = () => {
         setIsLoading(true);
         PostService.addPost(content, file as File).then(res => {
-            console.log(res.data)
             setIsLoading(false);
             setFile(null);
             setContent('');
@@ -40,7 +39,7 @@ export default function CreatePostModal({ isOpen, closeModal, contentLabel }: Cr
     </div>
     const auth = useAuth();
     const Body = <div className='flex flex-col max-w-[500px]'>
-        <AvatarWithName name={auth.user?.firstName + " " + auth.user?.lastName} avatar={auth.user?.userDetail.avatarURL} />
+        <AvatarWithName name={auth.user?.firstName + " " + auth.user?.lastName} avatar={auth.user?.userDetail.avatarUrl} />
         <div className=' overflow-y-auto no-scrollbar max-h-[400px]'>
             <div className='mt-1'>
                 <textarea onInput={handleTextAreaChange} value={content} className='w-full resize-none outline-none text-2xl p-2 overflow-y-hidden' onChange={(e) => { e.currentTarget.style.height = e.currentTarget.scrollHeight + 'px' }} placeholder="What's on your mind?"></textarea>

@@ -5,11 +5,11 @@ import friendService from '../../Services/FriendService';
 interface Props {
     setIsHasFriendRequest: React.Dispatch<React.SetStateAction<boolean>>;
     user: {
-        id: string;
+        _id: string;
         firstName: string;
         lastName: string;
         userDetail: {
-            avatarURL: string;
+            avatarUrl: string;
         }
     }
 }
@@ -17,7 +17,7 @@ interface Props {
 export default function FriendRequest({ user, setIsHasFriendRequest }: Props) {
 
     const handleAccept = () => {
-        friendService.acceptFriendRequest(user.id).then(() => {
+        friendService.acceptFriendRequest(user._id).then(() => {
             console.log('friend request accepted');
             setIsHasFriendRequest((pre) => !pre);
         }
@@ -28,7 +28,7 @@ export default function FriendRequest({ user, setIsHasFriendRequest }: Props) {
 
     }
     const handleReject = () => {
-        friendService.refuseFriendRequest(user.id).then(() => {
+        friendService.refuseFriendRequest(user._id).then(() => {
             console.log('friend request rejected');
             setIsHasFriendRequest((pre) => !pre);
         }
@@ -46,7 +46,7 @@ export default function FriendRequest({ user, setIsHasFriendRequest }: Props) {
         <div className='flex  justify-between m-3 items-center hover:bg-slate-50 p-2 rounded-md'>
             <div className='flex items-start gap-x-4 text-black grow'>
                 <div className='grow-0'>
-                    <img src={user.userDetail.avatarURL} alt="" className='object-cover border-2 border-solid w-[60px] h-[60px] rounded-full' />
+                    <img src={user.userDetail.avatarUrl} alt="" className='object-cover border-2 border-solid w-[60px] h-[60px] rounded-full' />
                 </div>
                 <div className='flex flex-col mt-2 justify-between gap-y-5 grow'>
                     <div className='font-medium'>{user.firstName + " " + user.lastName}</div>

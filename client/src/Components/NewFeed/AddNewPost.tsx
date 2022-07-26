@@ -7,7 +7,6 @@ export default function AddNewPost() {
     const [isOpenModal, setIsOpenModal] = React.useState(false);
     function openCreatePostModal() {
         setIsOpenModal(true)
-        console.log('openCreatePostModal');
     }
     function closeCreatePostModel() {
         setIsOpenModal(false)
@@ -16,7 +15,7 @@ export default function AddNewPost() {
         <div className='m-2 text-unactive'>
             <CreatePostModal closeModal={closeCreatePostModel} isOpen={isOpenModal} contentLabel='create post' />
             <div className={`flex gap-x-2 ml py-2 pb-3`}>
-                <div className='flex justify-center items-center'><img className='rounded-full object-cover w-10 h-10' src={auth.user?.userDetail.avatarURL} alt="avatar" /></div>
+                <div className='flex justify-center items-center'><img className='rounded-full object-cover w-10 h-10' src={auth.user?.userDetail.avatarUrl} alt="avatar" /></div>
                 <div onClick={openCreatePostModal} className='bg-[#F0F2F5] grow rounded-full flex items-center p-2 cursor-pointer'>
 
                     <input type="text" onClick={openCreatePostModal} disabled name="status" className='cursor-pointer hidden xl:flex flex-grow outline-none bg-transparent' placeholder="What's on your mind, Hoangf?" />

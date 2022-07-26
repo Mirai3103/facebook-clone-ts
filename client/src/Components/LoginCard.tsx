@@ -2,6 +2,7 @@ import React from 'react'
 import { useToast } from '../Contexts/Toast';
 import useAuth from '../Hooks/useAuth';
 import authService from '../Services/AuthService'
+import { addHeader } from '../Services/AxiosConfig';
 
 interface LoginCardProps {
     openSignupModal: () => void,
@@ -14,10 +15,9 @@ export default function LoginCard({ openSignupModal }: LoginCardProps) {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
     const handleLogin = () => {
-        console.log(email, password);
         authService.login(email, password).then((res) => {
-            console.log('login success', res.data);
             localStorage.setItem('token', res.data.token);
+            addHeader('Authorization', `${res.data.token}`);
             auth.setUser(res.data.user);
             auth.setIsLoggedIn(true);
         }

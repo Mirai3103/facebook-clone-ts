@@ -7,10 +7,10 @@ import path from 'path';
 import dotenv from 'dotenv';
 import commandLineArgs from 'command-line-args';
 import { Sequelize } from 'sequelize-typescript'
-import User, { UserDetail, FriendList, FriendRequest } from '../models/user.model'
 import Post from '../models/post.model'
 import Message from '../models/message.model';
 import logger from 'jet-logger';
+import mongoose from 'mongoose';
 
 
 
@@ -31,19 +31,29 @@ import logger from 'jet-logger';
     const result2 = dotenv.config({
         path: path.join(__dirname, `env/${options.env as string}.env`),
     });
-    const sequelize = new Sequelize({
-        database: process.env.DB as string,
-        dialect: 'mysql',
-        username: process.env.USER as string,
-        password: process.env.PASSWORD as string,
-        host: process.env.HOST as string,
-        port: process.env.DB_PORT as any as number,
-        models: [User, UserDetail, Post, FriendList, FriendRequest, Message],
-        logging: false,
-    });
-    logger.info(process.env.CONCAC)
+    // const sequelize = new Sequelize({
+    //     database: process.env.DB as string,
+    //     dialect: 'postgres',
+    //     username: process.env.USER as string,
+    //     password: process.env.PASSWORD as string,
+    //     host: process.env.HOST as string,
+    //     port: process.env.DB_PORT as any as number,
+    //     models: [User, UserDetail, Post, FriendList, FriendRequest, Message],
+    //     logging: false,
+    //     dialectOptions: {
+    //         ssl: {
+    //             require: true,
+    //             rejectUnauthorized: false
+    //         }
+    //     },
+    // });
+
     try {
-        await sequelize.sync();
+        // await sequelize.sync();
+
+
+        await mongoose.
+            connect(process.env.MONGODB_CONNECT_STRING || "mongodb://localhost:27017/fb");
         logger.info('Database synced')
 
 

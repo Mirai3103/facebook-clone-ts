@@ -1,9 +1,9 @@
-import instance from "./AxiosConfig";
+import instance, { baseURL } from "./AxiosConfig";
 
 
 
 export interface IPost {
-    id?: number;
+    _id?: string;
     content?: string;
     imageUrl?: string;
     likes?: number;
@@ -24,18 +24,18 @@ function addPost(content: string, file: File) {
     data.append('file', file);
     data.append('content', content);
 
-    return instance.post('/post/add', data);
+    return instance.post(baseURL + '/post/add', data);
 }
 
 function getAllPosts() {
-    return instance.get('/post/all');
+    return instance.get(baseURL + '/post/all');
 }
 
 function updatePost(postId: number, post: IPost) {
-    return instance.put('/post/update', { postId, post });
+    return instance.put(baseURL + '/post/update', { postId, post });
 }
 function deletePost(postId: number) {
-    return instance.delete('/post/delete/' + postId);
+    return instance.delete(baseURL + '/post/delete/' + postId);
 }
 
 export default {

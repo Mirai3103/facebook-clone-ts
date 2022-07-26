@@ -6,7 +6,7 @@ import { IoMdArrowDropdown } from 'react-icons/io';
 import useAuth from '../../Hooks/useAuth';
 
 
-import ContentLoader, { Facebook } from 'react-content-loader'
+import { Facebook } from 'react-content-loader'
 
 export default function Right() {
     const Auth = useAuth();
@@ -16,7 +16,7 @@ export default function Right() {
             <ul className='flex grow-0 items-center gap-x-2'>
                 <li className='xl:flex items-center hover:bg-[#F2F2F2]  rounded-full py-1 px-2 hidden'>
                     <div className='w-9 h-9 rounded-full overflow-hidden'>
-                        {Auth.isLoggedIn && Auth.user?.userDetail.avatarURL ? < img src={Auth.user?.userDetail.avatarURL} className='w-full rounded-full h-full object-cover' alt="" /> : <div className='skeleton-loading'><Facebook /></div>}
+                        {Auth.isLoggedIn && Auth.user?.userDetail.avatarUrl ? < img src={Auth.user?.userDetail.avatarUrl} className='w-full rounded-full h-full object-cover' alt="" /> : <div className='skeleton-loading'><Facebook /></div>}
                     </div>
                     <div className='ml-3 min-w-[40px]'>
                         {

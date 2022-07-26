@@ -1,20 +1,19 @@
 import { Op } from 'sequelize';
-import User, { IdentifyUser, IUser, UserCreator, UserDetail } from '../models/user.model';
+import User, { IUserDocument, IUser } from '../models/user.model';
 import { BadRequestError, NotFoundError } from '../shared/errors';
 
 
 
-async function getAll(): Promise<User[]> {
-    return await User.findAll();
+async function getAll() {
+    return await User.find().exec();
 }
 
 
-async function addOne(user: UserCreator): Promise<IUser> {
+async function addOne(user: IUser) {
+
     const oldUser = await User.findOne({
-        where: {
-            email: user.email
-        }
-    });
+        email: user.email
+    }).exec();
     if (oldUser) {
         throw new BadRequestError('User already exists');
     }
@@ -23,8 +22,8 @@ async function addOne(user: UserCreator): Promise<IUser> {
     return newUser.toJSON();
 }
 
-async function findByPk(id: string): Promise<User> {
-    const user = await User.findByPk(id);
+async function findByPk(id: string) {
+    const user = await User.findById(id).exec();
     if (!user) {
         throw new NotFoundError("User not found");
     }
@@ -32,46 +31,34 @@ async function findByPk(id: string): Promise<User> {
 }
 
 async function findByEmail(email: string) {
-    const user = await User.findOne({
-        where: {
-            email
-        }
-    });
+    const user = await User.findOne({ email }).exec();
     if (!user) {
         throw new NotFoundError("User not found");
     }
     return user;
 }
 
-async function updateOne(identify: IdentifyUser, user: UserCreator): Promise<void> {
-    await User.update({
-        ...user,
-    }, {
-        where: { ...identify },
-    });
-}
+// async function updateOne(identify: IdentifyUser, user: UserCreator): Promise<void> {
+//     await User.update({
+//         ...user,
+//     }, {
+//         where: { ...identify },
+//     });
+// }
 
-function deleteOne(identify: IdentifyUser): void {
-    User.destroy({
-        where: { ...identify },
-    });
-}
+// function deleteOne(identify: IdentifyUser): void {
+//     User.destroy({
+//         where: { ...identify },
+//     });
+// }
 
-async function findLikeName(name: string): Promise<User[]> {
-    const user = await User.findAll({
-        attributes: ['id', 'firstName', 'lastName', 'email'],
-        include: [{
-            model: UserDetail,
-            attributes: ['avatarURL'],
-
-        }],
-        where: {
-            [Op.or]: [
-                { firstName: { [Op.like]: `%${name}%` } },
-                { lastName: { [Op.like]: `%${name}%` } },
-            ]
-        }
-    });
+async function findLikeName(name: string) {
+    const user = await User.find({
+        $or: [
+            { firstName: { $regex: '.*' + name + '.*' } },
+            { lastName: { $regex: '.*' + name + '.*' } },
+        ]
+    }).select('firstName lastName userDetail').exec();
     return user;
 }
 
@@ -84,7 +71,8 @@ export default {
     findByEmail,
     getAll,
     addOne,
-    updateOne,
-    delete: deleteOne,
+
     findLikeName,
 } as const;
+//    updateOne,
+// delete: deleteOne,

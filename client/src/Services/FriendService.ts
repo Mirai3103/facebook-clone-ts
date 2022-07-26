@@ -1,23 +1,23 @@
-import instance from "./AxiosConfig";
+import instance, { baseURL } from "./AxiosConfig";
 import { IUserSearch } from './UserService';
 
 export type IUser = IUserSearch;
 
 function sendFriendRequest(friendId: string) {
-    return instance.get(`/friend/add/${friendId}`);
+    return instance.get(baseURL + `/friend/add/${friendId}`);
 }
 
 function getAllFriendRequests() {
-    return instance.get(`/friend/requests`);
+    return instance.get(baseURL + `/friend/requests`);
 }
 function acceptFriendRequest(friendId: string) {
-    return instance.get(`/friend/accept/${friendId}`);
+    return instance.get(baseURL + `/friend/accept/${friendId}`);
 }
 function refuseFriendRequest(friendId: string) {
-    return instance.get(`/friend/decline/${friendId}`);
+    return instance.get(baseURL + `/friend/decline/${friendId}`);
 }
 function getAllFriends() {
-    return instance.get(`/friend/all`);
+    return instance.get(baseURL + `/friend/all`);
 }
 
 export default {

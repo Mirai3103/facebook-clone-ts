@@ -1,7 +1,7 @@
-import instance from "./AxiosConfig";
+import instance, { baseURL } from "./AxiosConfig";
 
 function getMessages(toUserId: string) {
-    return instance.get(`/chat/message/${toUserId}`);
+    return instance.get(baseURL + `/chat/message/${toUserId}`);
 }
 
 export default {

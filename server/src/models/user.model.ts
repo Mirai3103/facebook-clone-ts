@@ -1,229 +1,112 @@
+import mongoose, { PopulatedDoc, Document, Schema } from 'mongoose';
+import './userDetail.model';
+import { v4 } from 'uuid';
+import { hashPassword } from '@shared/security';
+import UserDetail, { IUserDetail, userDetailSchema } from './userDetail.model';
 
-import {
-    Column, Model, PrimaryKey, Table,
-    DataType, ForeignKey, HasOne,
-    BelongsTo, BeforeCreate, AfterCreate, HasMany, BelongsToMany
-} from "sequelize-typescript";
-import { Optional } from "sequelize/types";
-import { hashPassword } from "@shared/security";
-import Post from "./post.model";
 
 export enum UserRoles {
-    USER,
-    ADMIN,
+    USER = 0,
+    ADMIN = 1,
 }
 export enum Genders {
-    MALE,
-    FEMALE,
-    OTHER
+    MALE = 0,
+    FEMALE = 1,
+    OTHER = 2
 }
 
-
 export interface IUser {
-    id: string;
     firstName: string;
     lastName: string;
     email: string;
     pwdHash: string;
-    role: UserRoles;
+    userDetail?: PopulatedDoc<IUserDetail>;
+    role?: UserRoles;
     gender: Genders;
     birthday: Date;
 }
 
-export interface IdentifyUser {
-    id?: string
-    email?: string
+export interface IUserDocument extends IUser, Document {
+    _id: string;
+    userDetail: PopulatedDoc<IUserDetail>;
 }
 
-export type UserCreator = Optional<IUser, 'id' | 'role'>
 
-@Table({ timestamps: true })
-class User extends Model<IUser, UserCreator> {
-    @PrimaryKey
-    @Column({
-        type: DataType.UUID,
-        defaultValue: DataType.UUIDV1,
-    })
-    id!: string;
-    @Column({
-        type: DataType.STRING(20),
-        allowNull: false,
-    })
-    firstName!: string;
-    @Column({
-        type: DataType.STRING(20),
-        allowNull: false,
-    })
-    lastName!: string;
-    @Column({
-        type: DataType.STRING(60),
-        allowNull: false,
+const userSchema = new mongoose.Schema({
+    _id: {
+        type: String,
+        required: true,
+        default: function () {
+            return v4();
+        }
+    },
+    firstName: {
+        type: String,
+        required: true,
+        minLength: 2,
+        maxLength: 10,
+    },
+    lastName: {
+        type: String,
+        required: true,
+        minLength: 2,
+        maxLength: 10,
+    },
+    email: {
+        type: String,
+        required: true,
+        minLength: 2,
+        maxLength: 40,
         unique: true,
-    })
-    email!: string;
-    @Column({
-        type: DataType.CHAR(60),
-        allowNull: false,
-        unique: true,
-    })
-    pwdHash!: string;
-    @Column({
-        type: DataType.ENUM("USER", "ADMIN"),
-        allowNull: false,
-        defaultValue: UserRoles[UserRoles.USER],
-    })
-    role?: UserRoles;
-    @Column({
-        type: DataType.ENUM("MALE", "FEMALE", "OTHER"),
-        allowNull: false,
-    })
-    gender!: Genders;
-    @Column({
-        type: DataType.DATEONLY,
-        allowNull: false
-    })
-    birthday!: Date;
-    @HasOne(() => UserDetail)
-    userDetail!: UserDetail
-    @BeforeCreate
-    static hashPassword(instance: User) {
-        instance.pwdHash = hashPassword(instance.pwdHash);
     }
-    @AfterCreate
-    static createUserDetail(instance: User) {
-        instance.userDetail = new UserDetail({ userId: instance.id });
-        instance.userDetail.email = instance.email;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        if (instance.gender === Genders[Genders.MALE]) {
-            instance.userDetail.avatarURL =
+    ,
+    pwdHash: {
+        type: String,
+        required: true,
+    },
+    role: {
+        type: Number,
+        required: false,
+        enum: [0, 1],
+        default: 0,
+    },
+    gender: {
+        type: Number,
+        required: true,
+        enum: [0,
+            1,
+            2]
+    }
+    ,
+    birthday: {
+        type: Date,
+        required: true,
+    },
+    userDetail: userDetailSchema
+
+}, { timestamps: true });
+
+
+userSchema.pre('save', function (next) {
+    this.userDetail = new UserDetail({
+        phoneNumber: '',
+        avatarUrl: '',
+        location: '',
+    });
+    if (this.isModified('pwdHash')) {
+        this.pwdHash = hashPassword(this.pwdHash);
+        if (this.gender === Genders.MALE) {
+            this.userDetail.avatarUrl =
                 'https://drive.google.com/uc?export=view&id=1S7Xctscoqq0SylFWpW4EGRRrYCn2PSjO'
         } else {
-            instance.userDetail.avatarURL =
+            this.userDetail.avatarUrl =
                 'https://drive.google.com/uc?export=view&id=1e73g_Rglt4AtjtGwnlL6fG8rl0Qn83zy'
         }
-        instance.userDetail.save();
-
     }
-    @HasMany(() => Post)
-    posts!: Post[];
-    @BelongsToMany(() => User, () => FriendList, 'userId1', 'userId2')
-    friends1!: User[];
-}
 
-interface IUserDetail {
-    userId: string;
-    email?: string;
-    phoneNumber?: string;
-    avatarURL?: string;
-    location?: string;
-}
+    next();
+});
 
-
-@Table({
-    updatedAt: true,
-    createdAt: false,
-    deletedAt: false,
-})
-export class UserDetail extends Model<IUserDetail>{
-    @ForeignKey(() => User)
-    @Column({
-        type: DataType.UUID,
-        allowNull: false,
-        unique: true,
-    })
-    userId!: string;
-    @BelongsTo(() => User)
-    user!: User;
-    @Column({
-        type: DataType.STRING(20),
-        allowNull: true,
-    })
-    email?: string;
-    @Column({
-        type: DataType.STRING(60),
-        allowNull: true,
-    })
-    phoneNumber?: string;
-    @Column({
-        type: DataType.TEXT,
-        allowNull: true,
-    })
-    avatarURL?: string;
-    @Column({
-        type: DataType.CHAR(3),
-        allowNull: true,
-        defaultValue: "vi",
-    })
-    location?: string;
-
-}
-
+const User = mongoose.model<IUserDocument>("User", userSchema);
 
 export default User;
-
-export interface IFriendList {
-    id: number;
-    userId1: string;
-    userId2: string;
-}
-export type FriendListCreator = Optional<IFriendList, 'id'>
-
-@Table({ timestamps: true })
-export class FriendList extends Model<IFriendList, FriendListCreator> {
-    @PrimaryKey
-    @Column({
-        type: DataType.INTEGER,
-        autoIncrement: true,
-    })
-    id!: string;
-    @ForeignKey(() => User)
-    @Column({
-        type: DataType.UUID,
-        allowNull: false,
-    })
-    userId1!: string;
-
-    @ForeignKey(() => User)
-    @Column({
-        type: DataType.UUID,
-        allowNull: false,
-    })
-    userId2!: string;
-
-
-}
-
-export interface IFriendRequest {
-    id: number;
-    fromUserId: string;
-    toUserId: string;
-}
-export type FriendRequestCreator = Optional<IFriendRequest, 'id'>
-
-@Table({ timestamps: true })
-export class FriendRequest extends Model<IFriendRequest, FriendRequestCreator> {
-    @PrimaryKey
-    @Column({
-        type: DataType.INTEGER,
-        autoIncrement: true,
-    })
-    id!: number;
-
-    @Column({
-        type: DataType.UUID,
-        allowNull: false,
-        unique: false,
-    })
-    fromUserId!: string;
-    @ForeignKey(() => User)
-    @Column({
-        type: DataType.UUID,
-        allowNull: false,
-        unique: false,
-    })
-    toUserId!: string;
-
-}
-
-

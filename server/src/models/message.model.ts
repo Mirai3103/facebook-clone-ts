@@ -1,48 +1,28 @@
-import {
-    Column, Model, PrimaryKey, Table,
-    DataType
-} from "sequelize-typescript";
-import { Optional } from "sequelize/types";
-
-
-interface IMessage {
-    id: number;
-    fromUserId: string;
-    toUserId: string;
+import './user.model';
+import mongoose from 'mongoose';
+import { IUserDocument } from './user.model';
+export interface IMessage {
     message: string;
+    fromUser: mongoose.PopulatedDoc<IUserDocument>;
+    toUser: mongoose.PopulatedDoc<IUserDocument>;
 }
-
-export type MessageCreator = Optional<IMessage, 'id'>
-
-@Table({
-    timestamps: true
-})
-export default class Message extends Model<IMessage, MessageCreator> {
-    @PrimaryKey
-    @Column({
-        type: DataType.INTEGER,
-        autoIncrement: true,
-    })
-    id!: number;
-
-    @Column({
-        type: DataType.UUID,
-        allowNull: false,
-        unique: false,
-    })
-    fromUserId!: string;
-
-    @Column({
-        type: DataType.UUID,
-        allowNull: false,
-        unique: false,
-    })
-    toUserId!: string;
-
-    @Column({
-        type: DataType.TEXT,
-        allowNull: false,
-        unique: false,
-    })
-    message!: string;
+interface IMessageDocument extends Document, IMessage {
 }
+const schema = new mongoose.Schema({
+    fromUser: {
+        type: mongoose.Schema.Types.String,
+        ref: 'User',
+        required: true,
+    },
+    toUser: {
+        type: mongoose.Schema.Types.String,
+        ref: 'User',
+        required: true,
+    },
+    message: {
+        type: String,
+        required: true,
+    }
+});
+const Message = mongoose.model<IMessageDocument>('Message', schema);
+export default Message;

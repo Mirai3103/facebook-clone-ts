@@ -11,7 +11,6 @@ export default function DropMedia({ setFile }: DropMediaProps) {
     const [preview, setPreview] = React.useState<JSX.Element | null>(null);
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files
-        console.log(file)
         if (file) {
             URL.revokeObjectURL(preview?.props.src)
             let src = URL.createObjectURL(file[0]);

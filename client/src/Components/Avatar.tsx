@@ -1,7 +1,7 @@
 import React from 'react'
 
 interface AvatarProps {
-    avatarURL?: string
+    avatarUrl?: string
     size: 'medium' | 'large' | 'small'
     className?: string
 }

@@ -52,7 +52,7 @@ export default function Contacts() {
 
         chatContext.addWindowsChatInfo({
             toUser: {
-                id,
+                _id: id,
                 name,
                 avatar
             }
@@ -70,8 +70,8 @@ export default function Contacts() {
 
         const handleMgs = (data: IData) => {
             for (const friend of friendList) {
-                if (friend.id === data.fromUserId) {
-                    handleClick(friend.id, friend.firstName + " " + friend.lastName, friend.userDetail.avatarURL)
+                if (friend._id === data.fromUserId) {
+                    handleClick(friend._id, friend.firstName + " " + friend.lastName, friend.userDetail.avatarUrl)
                 }
             }
         }
@@ -89,7 +89,7 @@ export default function Contacts() {
                 <div className='flex items-center justify-between text-unactive px-2 border-t-2'>
                     <div className='flex grow-0 text-lg mt-2'>Friend request</div>
                 </div>
-                {friendRequests.length > 0 && friendRequests.map(friendRequest => <FriendRequest setIsHasFriendRequest={setIsHasFriendRequest} key={(friendRequest as any).id} user={friendRequest}></FriendRequest>)}
+                {friendRequests.length > 0 && friendRequests.map(friendRequest => <FriendRequest setIsHasFriendRequest={setIsHasFriendRequest} key={(friendRequest as any)._id} user={friendRequest}></FriendRequest>)}
                 <div className='flex items-center justify-between text-unactive px-2 border-t-2'>
                     <div className='flex grow-0 text-lg  mt-2'>Contacts</div>
                     <div className='flex justify-end grow-0 '>
@@ -98,7 +98,7 @@ export default function Contacts() {
                         <div className='w-8 h-8 flex items-start justify-center rounded-full cursor-pointer hover:bg-[#E4E6E9]'>...</div>
                     </div>
                 </div>
-                {friendList.length > 0 && friendList.map(friend => <ShortCut key={friend.id} onClick={(e) => handleClick(friend.id, friend.firstName + " " + friend.lastName, friend.userDetail.avatarURL)} title={friend.firstName + " " + friend.lastName} isContact imageURL={friend.userDetail.avatarURL} />)}
+                {friendList.length > 0 && friendList.map(friend => <ShortCut key={friend._id} onClick={(e) => handleClick(friend._id, friend.firstName + " " + friend.lastName, friend.userDetail.avatarUrl)} title={friend.firstName + " " + friend.lastName} isContact imageURL={friend.userDetail.avatarUrl} />)}
 
             </div>
         </div>

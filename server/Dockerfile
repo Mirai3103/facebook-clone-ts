@@ -8,6 +8,6 @@ RUN  npm i -g typescript
 RUN yarn install
 RUN yarn build
 
-
+EXPOSE 6868
 
 CMD ["yarn", "start"]

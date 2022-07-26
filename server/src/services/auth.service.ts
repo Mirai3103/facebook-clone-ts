@@ -1,20 +1,28 @@
-import User, { IUser, UserCreator, UserDetail } from "@models/user.model";
+import User, { IUser } from "@models/user.model";
+import { IUserDetail } from "@models/userDetail.model";
 import { comparePassword, signUser, verifyUser } from "@shared/security";
-import userService from "./user.service";
 import { upload } from './googledriver'
 
-async function register(user: UserCreator, file: Express.Multer.File | undefined): Promise<IUser> {
+async function register(user: IUser, file: Express.Multer.File | undefined) {
     const newUser = await User.create(user);
+
 
     if (file) {
         const imageUrl = await upload(file.originalname, file.buffer);
         if (imageUrl) {
-            newUser.userDetail.avatarURL = "https://drive.google.com/uc?export=view&id=" + imageUrl;
-            await newUser.userDetail.save();
+            if (newUser.userDetail) {
+                await newUser.updateOne({
+                    userDetail: {
+                        avatarUrl: "https://drive.google.com/uc?export=view&id=" + imageUrl,
+                    }
+                }).exec();
+
+
+            }
         }
+
     }
-    newUser.save();
-    return newUser.toJSON();
+    return newUser;
 }
 
 interface LoginPayload {
@@ -24,26 +32,22 @@ interface LoginPayload {
 }
 
 async function login(loginPayload: LoginPayload) {
-    let user: User | null;
-
-
-
-    if (!loginPayload.email) {
-        user = await User.findOne(
-            { where: { email: loginPayload.email } }
-        );
+    let user: IUser & { _id: string } | null;
+    if (loginPayload.email) {
+        user = await User.findOne({ email: loginPayload.email }).exec();
     } else {
-        user = await User.findOne(
-            { where: { email: loginPayload.email }, include: [UserDetail] }
-        );
+        user = await User.findOne({
+            id: loginPayload.id,
+        }).exec();
     }
     if (!user) {
         throw new Error("User not found");
     }
+
     if (!comparePassword(loginPayload.password, user.pwdHash)) {
         throw new Error("Password is incorrect");
     }
-    return { token: signUser(user.toJSON()), user: user.toJSON() };
+    return { token: signUser(user), user };
 }
 
 async function identify(token: string) {
@@ -51,7 +55,8 @@ async function identify(token: string) {
     if (!userJWT) {
         throw new Error("Invalid token");
     }
-    const user = await User.findOne({ where: { id: userJWT.id }, include: [UserDetail] });
+    const user = await User.findOne({ _id: userJWT.id })
+        .select('-pwdHash -birthday').exec();
     if (!user) {
         throw new Error("User not found");
     }

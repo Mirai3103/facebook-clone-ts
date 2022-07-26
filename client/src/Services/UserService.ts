@@ -1,19 +1,19 @@
-import instance from "./AxiosConfig";
+import instance, { baseURL } from "./AxiosConfig";
 
 export interface IUserSearch {
-    id: string;
+    _id: string;
     firstName: string;
     lastName: string;
     email: string;
     userDetail: {
-        avatarURL: string;
+        avatarUrl: string;
     }
     relationship: string;
 }
 
 
 function getUserHasNameLike(name: string) {
-    return instance.get(`/users/search?name=${name}`);
+    return instance.get(baseURL + `/users/search?name=${name}`);
 }
 
 export default {

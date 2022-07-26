@@ -1,12 +1,11 @@
 import React from 'react';
 import ChatWindow from '../Components/ChatWindow';
-import useAuth from '../Hooks/useAuth';
 
 
 
 interface IWindowsChatInfo {
     toUser: {
-        id: string;
+        _id: string;
         name: string;
         avatar: string;
     }
@@ -28,7 +27,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     function addWindowsChatInfo(newWindow: IWindowsChatInfo) {
         if (windowsChatInfo) {
             for (const item of windowsChatInfo) {
-                if (item.toUser.id === newWindow.toUser.id) {
+                if (item.toUser._id === newWindow.toUser._id) {
                     return;
                 }
             }
@@ -40,7 +39,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const handleClose = (id: string) => {
         if (windowsChatInfo) {
-            setWindowsChatInfo(windowsChatInfo?.filter(item => item.toUser.id !== id))
+            setWindowsChatInfo(windowsChatInfo?.filter(item => item.toUser._id !== id))
         }
     }
 
@@ -48,7 +47,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         {children}
         <div className='fixed z-50 right-5 bottom-2 flex gap-x-3'>
             {windowsChatInfo?.map((item) => {
-                return <ChatWindow key={item.toUser.id} onClose={handleClose} toUser={item.toUser} />
+                return <ChatWindow key={item.toUser._id} onClose={handleClose} toUser={item.toUser} />
             })}
 
         </div>

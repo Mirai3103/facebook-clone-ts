@@ -1,4 +1,4 @@
-import { IUser, UserRoles } from '@models/user.model';
+import { IUser } from '@models/user.model';
 import { hashSync, compareSync, genSaltSync } from 'bcrypt';
 import { sign, verify } from 'jsonwebtoken';
 import { jwtOptions } from './configs';
@@ -15,11 +15,11 @@ export function comparePassword(password: string, hash: string): boolean {
 interface JWTDecoder {
     id: string
     email: string
-    role: UserRoles
+    role: number
 }
-export function signUser(user: IUser): string {
+export function signUser(user: IUser & { _id: string }): string {
     const payload = {
-        id: user.id,
+        id: user._id,
         email: user.email,
         role: user.role,
     };

@@ -2,7 +2,7 @@ import React from 'react';
 import Avatar from '../Avatar'
 interface StoryCardProps {
     fullName?: string,
-    avatarURL?: string,
+    avatarUrl?: string,
     previewURL?: string,
     className?: string,
 

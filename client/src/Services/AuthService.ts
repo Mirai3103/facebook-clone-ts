@@ -1,4 +1,4 @@
-import instance from "./AxiosConfig";
+import instance, { baseURL } from "./AxiosConfig";
 
 
 export enum Genders {
@@ -23,14 +23,15 @@ function register(user: IUser, file: File) {
     data.append('file', file);
     data.append('user', JSON.stringify(user));
 
-    return instance.post('/auth/register', data);
+    return instance.post(baseURL + '/auth/register', data);
 }
 
 function login(email: string, password: string) {
-    return instance.post('/auth/login', { email, password });
+    return instance.post(baseURL + '/auth/login', { email, password });
 }
 function identify() {
-    return instance.get('/auth/identify');
+
+    return instance.get(baseURL + '/auth/identify');
 }
 
 export default {

@@ -5,7 +5,7 @@ import ChatService from '../Services/ChatService';
 import { GrClose } from 'react-icons/gr';
 interface Props {
     toUser: {
-        id: string;
+        _id: string;
         name: string;
         avatar: string;
     }
@@ -14,9 +14,9 @@ interface Props {
 
 interface IMessage {
     message: string;
-    fromUserId: string;
+    fromUser: string;
     createdAt: Date;
-    id: number;
+    _id: string;
 }
 
 
@@ -29,8 +29,8 @@ export default function ChatWindow({ toUser, onClose }: Props) {
     const [messages, setMessages] = React.useState<IMessage[]>([]);
     const handleSendMessage = () => {
         auth.socket?.emit('message', {
-            fromUserId: auth.user?.id,
-            toUserId: toUser.id,
+            fromUserId: auth.user?._id,
+            toUserId: toUser._id,
             message
         });
     }
@@ -47,19 +47,19 @@ export default function ChatWindow({ toUser, onClose }: Props) {
 
     React.useEffect(() => {
         const handleNewMessage = (data: {
-            fromUserId: string;
-            toUserId: string;
+            fromUser: string;
+            toUser: string;
             message: string;
-            id: number;
+            _id: string;
         }) => {
-            if (data.toUserId === toUser.id || data.fromUserId === toUser.id) {
+            if (data.toUser === toUser._id || data.fromUser === toUser._id) {
                 setMessages((pre) =>
 
                     [{
                         message: data.message,
-                        fromUserId: data.fromUserId,
+                        fromUser: data.fromUser,
                         createdAt: new Date(),
-                        id: data.id
+                        _id: data._id
                     }, ...pre]
                 );
             }
@@ -68,25 +68,25 @@ export default function ChatWindow({ toUser, onClose }: Props) {
         return () => {
             auth.socket?.off('message', handleNewMessage);
         }
-    }, [auth.socket, toUser.id]);
+    }, [auth.socket, toUser._id]);
 
     React.useEffect(() => {
-        ChatService.getMessages(toUser.id).then((res) => {
+        ChatService.getMessages(toUser._id).then((res) => {
             setMessages((res.data.messages as IMessage[]).reverse());
         }
         );
-    }, [toUser.id]);
+    }, [toUser._id]);
 
 
     return (
         <div className='w-[338px] h-[445px] bg-white shadow-fb border rounded-lg flex flex-col'>
             <div className='py-2 px-3 border-b shadow-fb grow-0 flex justify-between'>
                 <AvatarWithName name={toUser.name} avatar={toUser.avatar} classNameSize="w-9 h-9" classFontSize='font-medium text-base' />
-                <div className='cursor-pointer flex items-center font-bold' onClick={() => onClose(toUser.id)} > <GrClose /></div>
+                <div className='cursor-pointer flex items-center font-bold' onClick={() => onClose(toUser._id)} > <GrClose /></div>
             </div>
             <div className='grow overflow-y-auto flex flex-col-reverse px-3 py-2'>
                 {messages.map(mgs => {
-                    return <MessageBox key={mgs.id} message={mgs.message} isOwn={mgs.fromUserId !== toUser.id} />
+                    return <MessageBox key={mgs._id} message={mgs.message} isOwn={mgs.fromUser !== toUser._id} />
                 })}
             </div>
             <div className='grow-0 flex px-2 py-1'>

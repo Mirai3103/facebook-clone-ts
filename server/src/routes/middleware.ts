@@ -1,4 +1,4 @@
-import User from "@models/user.model";
+import { IUserDocument } from "@models/user.model";
 import { cookieProps } from "@shared/configs";
 import { UnauthorizedError } from "@shared/errors";
 import { NextFunction, Request, Response } from "express";
@@ -7,15 +7,24 @@ import authService from "../services/auth.service";
 
 
 export interface CustomRequest extends Request {
-    user: User;
+    user: IUserDocument;
 }
 
 export async function authMw(req: Request, res: Response, next: NextFunction) {
+    console.log(req.headers.authorization);
 
-    const token = req.signedCookies[cookieProps.keyAccess];
+    let token = req.signedCookies[cookieProps.keyAccess];
     if (!token) {
-        throw new UnauthorizedError("Please login");
+        const tokenFormHeader = req.headers.authorization;
+        if (tokenFormHeader) {
+            token = tokenFormHeader;
+        }
+        else {
+            throw new UnauthorizedError("Please login to continue");
+        }
+
     }
+
     const user = await authService.identify(token as string);
 
     if (!user) {

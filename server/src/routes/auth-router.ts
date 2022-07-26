@@ -1,5 +1,5 @@
 
-import { UserCreator } from '@models/user.model';
+import { IUser, IUserDocument } from '@models/user.model';
 import { BadRequestError, UnauthorizedError } from '@shared/errors';
 import { Request, RequestHandler, Response, Router } from 'express';
 import StatusCodes from 'http-status-codes';
@@ -41,7 +41,7 @@ router.post(p.register, upload.single('file'), (async (req: Request, res: Respon
     if (!user) {
         throw new BadRequestError('User is required');
     }
-    const newUser = await authService.register(user as UserCreator, file);
+    const newUser = await authService.register(user as IUser, file);
     res.status(OK).json(newUser);
 }
 ) as RequestHandler);
@@ -62,11 +62,11 @@ router.post(p.login, (async (req: Request, res: Response) => {
 }) as RequestHandler);
 
 router.get(p.identify, (async (req: Request, res: Response) => {
-    const token = req.signedCookies[cookieProps.keyAccess];
+    const token = req.headers.authorization;
     if (!token) {
         throw new UnauthorizedError('Please login');
     }
-    const user = await authService.identify(token as string);
+    const user = await authService.identify(token);
     res.status(OK).json({ user, token });
 }) as RequestHandler);
 

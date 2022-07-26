@@ -1,19 +1,11 @@
 import { CorsOptions } from 'cors'
 import { SignOptions } from 'jsonwebtoken';
 import { CookieOptions } from 'express';
-export const corsOptions: CorsOptions = Object.freeze({
-    origin: 'http://localhost:3000',
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type',
-        'Authorization', 'Accept', 'Origin',
-        'X-Requested-With', 'Content-Length', 'Accept-Encoding',
-        'Accept-Language', 'Host', 'Referer', 'User-Agent', 'Cookie'],
-    exposedHeaders: ['Content-Type',
-        'Authorization', 'Accept', 'Origin',
-        'X-Requested-With', 'Content-Length', 'Accept-Encoding',
-        'Accept-Language', 'Host', 'Referer', 'User-Agent', 'Cookie']
-});
+
+export const corsOptions: CorsOptions = {
+    origin: process.env.CLIENT_DOMAIN || "*",
+}
+
 
 const signOptions: SignOptions =
 {
@@ -33,7 +25,7 @@ const options: CookieOptions = {
     secure: (process.env.SECURE_COOKIE === 'true'),
     maxAge: 216000 * 60,
     path: '/',
-    sameSite: 'strict',
+    sameSite: 'none',
 }
 
 

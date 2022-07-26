@@ -9,14 +9,12 @@ export default function SearchPeople() {
     const query = React.useMemo(() => new URLSearchParams(search)
         , [search]);
     const [users, setUsers] = React.useState<IUserSearch[]>([]);
-    console.log(users);
 
     React.useEffect(() => {
         const name = query.get('name');
         if (name) {
             UserService.getUserHasNameLike(name).then(res => {
                 setUsers(res.data.users);
-                console.log(res.data.users);
             }
             ).catch(err => {
                 console.log(err);
@@ -30,8 +28,8 @@ export default function SearchPeople() {
             <div className='flex w-full justify-center mt-16 '>
                 <div className='flex w-[500px] flex-col'>
                     {users?.map(user => {
-                        return <SearchResult user={user} key={user.id} />
-                    })}
+                        return <SearchResult user={user} key={user._id} />
+                    }) || <div>No result</div>}
                 </div>
             </div>
         </HomeLayout>

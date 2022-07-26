@@ -1,60 +1,51 @@
-import Post, { PostCreator } from "@models/post.model";
-import User, { UserDetail } from "@models/user.model";
+import Post, { IPost } from "@models/post.model";
+import User, { IUser, IUserDocument } from "@models/user.model";
 import { NotFoundError } from "@shared/errors";
 import { upload } from './googledriver'
 
 
-async function addPost(user: User, content: string,
-    file: Express.Multer.File | undefined): Promise<Post> {
+async function addPost(user: IUserDocument, content: string,
+    file: Express.Multer.File | undefined) {
 
-    const newPostCreator: PostCreator = {
+    const newPostCreator: IPost = {
         content,
-        userId: user.id,
+        user,
         likes: 0,
+        imageUrl: '',
     };
+
     if (file) {
         const imageUrl = await upload(file.originalname, file.buffer);
         newPostCreator.imageUrl = imageUrl as string;
     }
     const newPost = await Post.create(newPostCreator);
-    await newPost.save();
     return newPost;
 }
 
-async function getAllPosts(): Promise<Post[]> {
-    return await Post.findAll({
-        include: [{
-            model: User, attributes: ['firstName', 'lastName'],
-            include: [{
-                model: UserDetail, attributes: ['avatarUrl']
-            }]
-        }],
-        order: [
-            ['createdAt', 'DESC']
-        ]
-    });
+async function getAllPosts() {
+
+    return await Post.find()
+        .populate('user', 'firstName lastName userDetail')
+        .sort({ createdAt: 'desc' })
+        .exec();
 }
 
-async function getPostByPk(id: string): Promise<Post> {
-    const post = await Post.findByPk(id);
+
+
+async function getPostByPk(id: string) {
+    const post = await Post.findOne({ id }).exec();
     if (!post) {
         throw new NotFoundError("Post not found");
     }
     return post;
 }
 
-async function updatePost(postId: number, post: PostCreator): Promise<void> {
-    await Post.update({
-        ...post,
-    }, {
-        where: { id: postId },
-    });
+async function updatePost(postId: string, post: IPost): Promise<void> {
+    await Post.update({ id: postId }, post).exec();
 }
 
-async function deletePost(postId: number): Promise<void> {
-    await Post.destroy({
-        where: { id: postId },
-    });
+async function deletePost(postId: string): Promise<void> {
+    await Post.deleteOne({ id: postId }).exec();
 }
 
 export default {

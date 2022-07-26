@@ -1,11 +1,12 @@
 import React from 'react';
 import AuthService from '../Services/AuthService';
 import { io, Socket } from 'socket.io-client'
+import { addHeader } from '../Services/AxiosConfig';
 interface UserDetail {
-    avatarURL?: string;
+    avatarUrl?: string;
 }
 interface User {
-    id: string;
+    _id: string;
     email: string;
     avatar: string;
     firstName: string;
@@ -28,24 +29,33 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
 
     React.useEffect(() => {
-        AuthService.identify().then(res => {
-            if (res.data.user) {
-                localStorage.setItem('token', res.data.token);
-                setIsLoggedIn(true);
-                setUser(res.data.user);
-                console.log(res.data.user);
-            } else {
+        const token = localStorage.getItem('token');
+        if (token) {
+            addHeader('Authorization', `${token}`);
+            AuthService.identify().then(res => {
+                if (res.data.user) {
+                    localStorage.setItem('token', res.data.token);
+                    setIsLoggedIn(true);
+                    setUser(res.data.user);
+                } else {
+                    setIsLoggedIn(false);
+                }
+            }).catch(err => {
+                console.log(err);
                 setIsLoggedIn(false);
-            }
-        }).catch(err => {
-            console.log(err);
+                setUser(null);
+            });
+
+        } else {
             setIsLoggedIn(false);
             setUser(null);
-        });
+        }
+
 
     }, []);
 
     React.useEffect(() => {
+        //wss://facebook-laffy-server.herokuapp.com
         if (isLoggedIn) {
             if (socket === null) {
                 const IO = io(`ws://localhost:8080`, {
